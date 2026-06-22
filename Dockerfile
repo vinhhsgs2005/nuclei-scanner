@@ -3,6 +3,7 @@ FROM projectdiscovery/nuclei:latest
 USER root
 
 ENV GOGC=30
+ENV GOMEMLIMIT=350MiB
 
 RUN apk add --no-cache python3 py3-pip
  
