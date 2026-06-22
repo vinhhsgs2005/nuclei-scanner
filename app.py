@@ -11,12 +11,15 @@ def home():
 def scan():
     target = request.form["target"]
 
+    # Đã thêm các cờ tối ưu RAM vào mảng cmd
     cmd = [
         "nuclei",
-        "-u",
-        target,
-        "-json-export",
-        "results/output.json"
+        "-u", target,
+        "-json-export", "results/output.json",
+        "-c", "10",              
+        "-bs", "5",               
+        "-disable-update-check",  
+        "-ni"                     
     ]
 
     subprocess.run(cmd)
