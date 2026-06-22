@@ -18,7 +18,7 @@ def scan():
         "nuclei",
         "-u", target,
         "-j", "-o", output_file,
-        "-tags", "cve,exposures",
+        "-tags", "tech,ssl",
         "-c", "10",              
         "-bs", "5",
         "-disable-update-check",  
