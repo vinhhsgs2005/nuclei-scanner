@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan Results</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .high { color: red; font-weight: bold; }
+        .medium { color: orange; font-weight: bold; }
+        .low { color: blue; font-weight: bold; }
+        .desc { font-size: 0.9em; color: #555; } /* Chữ nhỏ và mờ hơn một chút cho phần mô tả */
+    </style>
+</head>
+<body>
+
+    <h1>Scan results for: {{ target }}</h1>
+    <a href="/"><button>Scan another target</button></a>
+
+    {% if results %}
+        <table>
+            <tr>
+                <th>Vulnerability Name</th>
+                <th>Severity</th>
+                <th>URL</th>
+                <th>Description</th> </tr>
+            {% for item in results %}
+            <tr>
+                <td>{{ item.info.name }}</td>
+                <td class="{{ item.info.severity | lower }}">
+                    {{ item.info.severity | upper }}
+                </td>
+                <td><a href="{{ item['matched-at'] }}" target="_blank">{{ item['matched-at'] }}</a></td>
+                
+                <td class="desc">
+                    {{ item.info.description | default('No description available.', true) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p style="color: green; margin-top: 20px; font-weight: bold;">
+            Scan complete! No vulnerabilities found matching the criteria.
+        </p>
+    {% endif %}
+
+</body>
+</html>
