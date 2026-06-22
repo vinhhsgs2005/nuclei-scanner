@@ -1,20 +1,26 @@
 FROM projectdiscovery/nuclei:latest
- 
+
 USER root
 
 ENV GOGC=30
 ENV GOMEMLIMIT=350MiB
 
+# 1. Xóa bỏ ENTRYPOINT mặc định của image gốc
+ENTRYPOINT []
+
 RUN apk add --no-cache python3 py3-pip
- 
+
 WORKDIR /app
- 
+
 COPY . .
- 
+
 RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
- 
+
+# 2. Tải sẵn templates trong lúc build để tránh sập RAM lúc chạy thực tế
+RUN nuclei -update-templates
+
 RUN mkdir -p results
- 
+
 EXPOSE 10000
- 
+
 CMD gunicorn app:app --bind 0.0.0.0:10000 --workers 1 --timeout 360
