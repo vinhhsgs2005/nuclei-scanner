@@ -2,22 +2,34 @@
 <html>
 <head>
     <title>Scan Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background-color: #f9f9f9; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background-color: #f2f2f2; }
+        .critical { color: purple; font-weight: bold; }
         .high { color: red; font-weight: bold; }
         .medium { color: orange; font-weight: bold; }
         .low { color: blue; font-weight: bold; }
-        .desc { font-size: 0.9em; color: #555; } /* Chữ nhỏ và mờ hơn một chút cho phần mô tả */
+        .info { color: green; font-weight: bold; }
+        .desc { font-size: 0.9em; color: #555; max-width: 400px; }
+        .chart-box { width: 300px; margin: 20px auto; }
+        button { padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <h1>Scan results for: {{ target }}</h1>
-    <a href="/"><button>Scan another target</button></a>
+<div class="container">
+    <h1>Scan Results for: {{ target }}</h1>
+    <a href="/"><button>Scan Another Target</button></a>
 
     {% if results %}
+        <div class="chart-box">
+            <canvas id="severityChart"></canvas>
+        </div>
+
         <table>
             <tr>
                 <th>Vulnerability Name</th>
@@ -25,24 +37,54 @@
                 <th>URL</th>
                 <th>Description</th> </tr>
             {% for item in results %}
-            <tr>
+            <tr class="vuln-row" data-severity="{{ item.info.severity | upper }}">
                 <td>{{ item.info.name }}</td>
-                <td class="{{ item.info.severity | lower }}">
-                    {{ item.info.severity | upper }}
-                </td>
+                <td class="{{ item.info.severity | lower }}">{{ item.info.severity | upper }}</td>
                 <td><a href="{{ item['matched-at'] }}" target="_blank">{{ item['matched-at'] }}</a></td>
-                
-                <td class="desc">
-                    {{ item.info.description | default('No description available.', true) }}
-                </td>
+                <td class="desc">{{ item.info.description | default('No description available.', true) }}</td>
             </tr>
             {% endfor %}
         </table>
     {% else %}
-        <p style="color: green; margin-top: 20px; font-weight: bold;">
+        <p style="color: green; margin-top: 20px; font-weight: bold; font-size: 1.2em;">
             Scan complete! No vulnerabilities found matching the criteria.
         </p>
     {% endif %}
+</div>
+
+<script>
+    // Logic đếm lỗi và vẽ biểu đồ tự động bằng JavaScript (Part 10)
+    const rows = document.querySelectorAll('.vuln-row');
+    let counts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, INFO: 0 };
+
+    rows.forEach(row => {
+        const sev = row.getAttribute('data-severity');
+        if (counts.hasOwnProperty(sev)) {
+            counts[sev]++;
+        }
+    });
+
+    if (rows.length > 0) {
+        const ctx = document.getElementById('severityChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Critical', 'High', 'Medium', 'Low', 'Info'],
+                datasets: [{
+                    data: [counts.CRITICAL, counts.HIGH, counts.MEDIUM, counts.LOW, counts.INFO],
+                    backgroundColor: ['purple', 'red', 'orange', 'blue', 'green']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: { display: true, text: 'Vulnerability Severity Distribution' }
+                }
+            }
+        });
+    }
+</script>
 
 </body>
 </html>

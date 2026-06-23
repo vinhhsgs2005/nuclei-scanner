@@ -13,14 +13,13 @@ def home():
 def scan():
     target = request.form["target"]
     output_file = "results/output.jsonl"
-
+    #localhost does not need: "-tags", "cve,exposures",  -c:10, -bs:5
     cmd = [
         "nuclei",
         "-u", target,
         "-j", "-o", output_file,
-        "-tags", "cve,exposures",
-        "-c", "10",              
-        "-bs", "5",
+        "-c", "50",              
+        "-bs", "25",
         "-disable-update-check",  
         "-ni"
     ]
