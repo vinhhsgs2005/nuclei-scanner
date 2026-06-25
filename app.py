@@ -18,8 +18,9 @@ def scan():
         "nuclei",
         "-u", target,
         "-j", "-o", output_file,
-        "-c", "50",              
-        "-bs", "25",
+        "-tags", "exposures,misconfiguration",
+        "-c", "5",              
+        "-bs", "2",
         "-disable-update-check",  
         "-ni"
     ]
